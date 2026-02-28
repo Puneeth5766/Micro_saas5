@@ -10,3 +10,6 @@ export type {
 
 export { UsageLog } from "./models/UsageLog";
 export type { AIProvider, IUsageLog } from "./models/UsageLog";
+
+export { AnalyticsEvent } from "./models/AnalyticsEvent";
+export type { AnalyticsCategory, IAnalyticsEvent } from "./models/AnalyticsEvent";

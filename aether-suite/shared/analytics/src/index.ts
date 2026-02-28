@@ -1,17 +1,5 @@
-import { z } from "zod";
+export { AETHER_EVENTS, AETHER_EVENT_NAMES } from "./events";
+export type { AetherEventCategory, AetherEventName } from "./events";
 
-const eventSchema = z.object({
-  name: z.string().min(1),
-  source: z.string().min(1),
-  payload: z.record(z.any()).default({})
-});
-
-export type AnalyticsEvent = z.infer<typeof eventSchema>;
-
-export function trackEvent(input: AnalyticsEvent): void {
-  const event = eventSchema.parse(input);
-
-  if (process.env.NODE_ENV !== "test") {
-    console.info("[analytics]", JSON.stringify(event));
-  }
-}
+export { trackEvent, trackPageView } from "./collector";
+export type { TrackEventParams, TrackPageViewParams } from "./collector";
