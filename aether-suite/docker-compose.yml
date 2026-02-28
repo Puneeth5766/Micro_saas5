@@ -1,0 +1,201 @@
+version: "3.9"
+
+services:
+  mongodb:
+    image: mongo:7
+    container_name: aether-mongodb-dev
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    env_file:
+      - .env
+    volumes:
+      # Persist MongoDB data across container restarts
+      - mongodb-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "mongodb://localhost:27017/admin", "--eval", "db.runCommand({ ping: 1 }).ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  mongo-express:
+    image: mongo-express:1.0.2
+    container_name: aether-mongo-express-dev
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      # Connect UI to local MongoDB service
+      ME_CONFIG_MONGODB_SERVER: mongodb
+      ME_CONFIG_BASICAUTH: "false"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8081 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  rfp-tool:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: rfp-tool
+    container_name: aether-rfp-tool-dev
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      WATCHPACK_POLLING: "true"
+    ports:
+      - "3001:3001"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    command: ["pnpm", "--filter", "@aether/rfp-tool", "dev", "--hostname", "0.0.0.0", "--port", "3001"]
+    volumes:
+      # Root workspace mount for hot-reload across app + shared packages
+      - ./:/workspace
+      # Keep container-managed node_modules isolated from host
+      - aether-node-modules:/workspace/node_modules
+      - rfp-next-cache:/workspace/apps/rfp-tool/.next
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:3001 || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+      start_period: 45s
+
+  compliance-tool:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: compliance-tool
+    container_name: aether-compliance-tool-dev
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: development
+      PORT: 3002
+      WATCHPACK_POLLING: "true"
+    ports:
+      - "3002:3002"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    command: ["pnpm", "--filter", "@aether/compliance-tool", "dev", "--hostname", "0.0.0.0", "--port", "3002"]
+    volumes:
+      - ./:/workspace
+      - aether-node-modules:/workspace/node_modules
+      - compliance-next-cache:/workspace/apps/compliance-tool/.next
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:3002 || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+      start_period: 45s
+
+  market-analyzer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: market-analyzer
+    container_name: aether-market-analyzer-dev
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: development
+      PORT: 3003
+      WATCHPACK_POLLING: "true"
+    ports:
+      - "3003:3003"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    command: ["pnpm", "--filter", "@aether/market-analyzer", "dev", "--hostname", "0.0.0.0", "--port", "3003"]
+    volumes:
+      - ./:/workspace
+      - aether-node-modules:/workspace/node_modules
+      - market-next-cache:/workspace/apps/market-analyzer/.next
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:3003 || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+      start_period: 45s
+
+  proposal-optimizer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: proposal-optimizer
+    container_name: aether-proposal-optimizer-dev
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: development
+      PORT: 3004
+      WATCHPACK_POLLING: "true"
+    ports:
+      - "3004:3004"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    command: ["pnpm", "--filter", "@aether/proposal-optimizer", "dev", "--hostname", "0.0.0.0", "--port", "3004"]
+    volumes:
+      - ./:/workspace
+      - aether-node-modules:/workspace/node_modules
+      - proposal-next-cache:/workspace/apps/proposal-optimizer/.next
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:3004 || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+      start_period: 45s
+
+  landing-critic:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: landing-critic
+    container_name: aether-landing-critic-dev
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: development
+      PORT: 3005
+      WATCHPACK_POLLING: "true"
+    ports:
+      - "3005:3005"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    command: ["pnpm", "--filter", "@aether/landing-critic", "dev", "--hostname", "0.0.0.0", "--port", "3005"]
+    volumes:
+      - ./:/workspace
+      - aether-node-modules:/workspace/node_modules
+      - landing-next-cache:/workspace/apps/landing-critic/.next
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:3005 || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+      start_period: 45s
+
+volumes:
+  mongodb-data:
+  aether-node-modules:
+  rfp-next-cache:
+  compliance-next-cache:
+  market-next-cache:
+  proposal-next-cache:
+  landing-next-cache:
