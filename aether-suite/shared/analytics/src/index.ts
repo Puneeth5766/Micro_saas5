@@ -5,3 +5,5 @@ export { trackEvent, trackPageView } from "./collector";
 export type { TrackEventParams, TrackPageViewParams } from "./collector";
 
 export { analyticsClient, useAnalytics } from "./client";
+
+export * from "./aggregations";
