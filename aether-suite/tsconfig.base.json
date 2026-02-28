@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "strict": true,
+    "noImplicitOverride": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "allowJs": false,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "declaration": true,
+    "declarationMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@aether/ui": ["shared/ui/src/index.ts"],
+      "@aether/auth": ["shared/auth/src/index.ts"],
+      "@aether/ai": ["shared/ai/src/index.ts"],
+      "@aether/billing": ["shared/billing/src/index.ts"],
+      "@aether/analytics": ["shared/analytics/src/index.ts"],
+      "@aether/db": ["shared/db/src/index.ts"],
+      "@aether/config": ["shared/config/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "dist", "build", ".next", ".turbo"]
+}
